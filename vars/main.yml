@@ -1,0 +1,8 @@
+# use_ufw: true
+
+# dns:
+# - 1.1.1.1
+
+# clients:
+# - name: client0
+#   password: qwe123

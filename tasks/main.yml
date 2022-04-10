@@ -1,0 +1,128 @@
+- name: Create system group
+  group:
+    name: proxy3
+    gid: '{{ system_group_id }}'
+    state: present
+  become: true
+
+- name: Create system user
+  user:
+    name: proxy3
+    group: proxy3
+    uid: '{{ system_user_id }}'
+    system: true
+    create_home: false
+    shell: /sbin/nologin
+    state: present
+  become: true
+
+- name: Install build-essential
+  apt:
+    name: build-essential
+    state: latest
+    update_cache: true
+  become: true
+
+- name: Download sources
+  get_url:
+    url: 'https://github.com/3proxy/3proxy/archive/refs/tags/{{ version }}.tar.gz'
+    dest: /tmp/{{ version }}.tar.gz
+  delegate_to: localhost
+  run_once: true
+
+- name: Unarchive sources
+  unarchive:
+    src: /tmp/{{ version }}.tar.gz
+    dest: /tmp/
+
+- name: Compile sources
+  make:
+    chdir: /tmp/3proxy-{{ version }}
+    file: Makefile.Linux
+
+- name: Create work dir
+  file:
+    path: /etc/3proxy
+    state: directory
+    owner: proxy3
+    group: proxy3
+    mode: '0644'
+  become: true
+
+- name: Copy binaries
+  copy:
+    src: /tmp/3proxy-{{ version }}/bin/3proxy
+    dest: /usr/bin/3proxy
+    owner: root
+    group: root
+    mode: '0755'
+    remote_src: true
+  become: true
+
+- name: Generate encrypted password
+  shell:
+    cmd: 'openssl passwd -1 {{ client.password }}'
+  loop: '{{ clients }}'
+  loop_control:
+    loop_var: client
+    label: client.name
+  register: encrypted_passwords
+  when:
+  - clients is defined
+  - clients is iterable
+
+- name: Fill and copy config
+  template:
+    src: 3proxy-cfg.j2
+    dest: /etc/3proxy/3proxy.cfg
+    owner: proxy3
+    group: proxy3
+    mode: '0400'
+  become: true
+
+- name: Copy systemd unit file
+  copy:
+    src: 3proxy.service
+    dest: /etc/systemd/system/3proxy.service
+  become: true
+
+- name: Start / Restart service
+  systemd:
+    service: 3proxy
+    state: restarted
+    enabled: true
+    daemon_reload: true
+  become: true
+
+- name: Wait 5 seconds...
+  pause:
+    seconds: 5
+
+- name: Check service status
+  shell:
+    cmd: systemctl status 3proxy.service
+  register: service_info
+  failed_when: ('active' not in service_info.stdout)
+  changed_when: false
+
+- name: Add rules of Uncomplicated Firewall
+  ufw:
+    rule: allow
+    port: '{{ port }}'
+    protocol: tcp
+    state: enabled
+  loop:
+    - '{{ http_port }}'
+    - '{{ socks_port }}'
+    - '{{ ansible_port }}'
+  loop_control:
+    loop_var: port
+    label: '{{ port }}/tcp'
+  when: use_ufw
+  become: true
+
+- name: Reload Uncomplicated Firewall service
+  ufw:
+    state: reloaded
+  when: use_ufw
+  become: true
