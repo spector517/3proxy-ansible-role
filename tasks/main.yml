@@ -25,7 +25,7 @@
 
 - name: Download sources
   get_url:
-    url: 'https://github.com/3proxy/3proxy/archive/refs/tags/{{ version }}.tar.gz'
+    url: 'https://github.com/3proxy/3proxy/archive/refs/tags/{{ proxy3_version }}.tar.gz'
     dest: /tmp/{{ proxy3_version }}.tar.gz
   delegate_to: localhost
   run_once: true
@@ -68,8 +68,8 @@
     label: client.name
   register: encrypted_passwords
   when:
-  - clients is defined
-  - clients is iterable
+  - proxy3_clients is defined
+  - proxy3_clients is iterable
 
 - name: Fill and copy config
   template:
@@ -118,11 +118,11 @@
   loop_control:
     loop_var: port
     label: '{{ port }}/tcp'
-  when: use_ufw
+  when: proxy3_use_ufw
   become: true
 
 - name: Reload Uncomplicated Firewall service
   ufw:
     state: reloaded
-  when: use_ufw
+  when: proxy3_use_ufw
   become: true
