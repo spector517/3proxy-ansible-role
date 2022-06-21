@@ -1,5 +1,5 @@
 galaxy_info:
-  role_name: 3proxy
+  role_name: proxy3
   author: Alexander (SpectoR) Borunov
   description: Install HTTP and SOCKS proxy server '3proxy'
 
