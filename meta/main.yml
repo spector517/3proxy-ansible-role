@@ -1,7 +1,7 @@
 galaxy_info:
   role_name: proxy3
   author: Alexander (SpectoR) Borunov
-  description: Install HTTP and SOCKS proxy server '3proxy'
+  description: Install HTTP and SOCKS proxy server "3proxy"
 
   # If the issue tracker for your role is not on github, uncomment the
   # next line and provide a value
