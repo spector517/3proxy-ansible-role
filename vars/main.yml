@@ -1,8 +1,8 @@
-# use_ufw: true
+# proxy3_use_ufw: true
 
-# dns:
+# proxy3_dns:
 # - 1.1.1.1
 
-# clients:
+# proxy3_clients:
 # - name: client0
 #   password: qwe123

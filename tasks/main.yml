@@ -1,7 +1,7 @@
 - name: Create system group
   group:
     name: proxy3
-    gid: '{{ system_group_id }}'
+    gid: '{{ proxy3_system_group_id }}'
     state: present
   become: true
 
@@ -9,7 +9,7 @@
   user:
     name: proxy3
     group: proxy3
-    uid: '{{ system_user_id }}'
+    uid: '{{ proxy3_system_user_id }}'
     system: true
     create_home: false
     shell: /sbin/nologin
@@ -26,18 +26,18 @@
 - name: Download sources
   get_url:
     url: 'https://github.com/3proxy/3proxy/archive/refs/tags/{{ version }}.tar.gz'
-    dest: /tmp/{{ version }}.tar.gz
+    dest: /tmp/{{ proxy3_version }}.tar.gz
   delegate_to: localhost
   run_once: true
 
 - name: Unarchive sources
   unarchive:
-    src: /tmp/{{ version }}.tar.gz
+    src: /tmp/{{ proxy3_version }}.tar.gz
     dest: /tmp/
 
 - name: Compile sources
   make:
-    chdir: /tmp/3proxy-{{ version }}
+    chdir: /tmp/3proxy-{{ proxy3_version }}
     file: Makefile.Linux
 
 - name: Create work dir
@@ -51,7 +51,7 @@
 
 - name: Copy binaries
   copy:
-    src: /tmp/3proxy-{{ version }}/bin/3proxy
+    src: /tmp/3proxy-{{ proxy3_version }}/bin/3proxy
     dest: /usr/bin/3proxy
     owner: root
     group: root
@@ -62,7 +62,7 @@
 - name: Generate encrypted password
   shell:
     cmd: 'openssl passwd -1 {{ client.password }}'
-  loop: '{{ clients }}'
+  loop: '{{ proxy3_clients }}'
   loop_control:
     loop_var: client
     label: client.name
@@ -112,8 +112,8 @@
     protocol: tcp
     state: enabled
   loop:
-    - '{{ http_port }}'
-    - '{{ socks_port }}'
+    - '{{ proxy3_http_port }}'
+    - '{{ proxy3_socks_port }}'
     - '{{ ansible_port }}'
   loop_control:
     loop_var: port
