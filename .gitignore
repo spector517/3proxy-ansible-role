@@ -1,0 +1,4 @@
+playbook.yml
+inventory.ini
+ansible.cfg
+ansible.log
