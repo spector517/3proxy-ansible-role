@@ -1,13 +1,25 @@
+# 3Proxy server version
 proxy3_version: 0.9.4
-proxy3_http_port: 23128
-proxy3_socks_port: 21080
+
+# Port of HTTP proxy
+proxy3_http_port: 3128
+
+# Port of SOCKS proxy
+proxy3_socks_port: 1080
+
+# System user ID and Group ID
 proxy3_system_group_id: 200
 proxy3_system_user_id: 201
 
+# List of DNS servers
 proxy3_dns:
 - 1.1.1.1
 
+# true if you want use the Uncomplicated Firewall
+# if false you may need to use other firewall
 proxy3_use_ufw: false
-proxy3_clients:
-- name: client0
-  password: qwe123
+
+# Clients of proxy server (accept all connections if empty or undefined)
+# proxy3_clients:
+# - name: client0
+#   password: qwe123
