@@ -1,7 +1,7 @@
 "3proxy" Ansible Role
 =========
 
-Install and deploy HTTP and SOCKS proxy server "3proxy"
+Deploy and configure HTTP and SOCKS proxy server "3proxy"
 
 Requirements
 ------------
