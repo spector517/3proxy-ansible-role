@@ -43,8 +43,8 @@ proxy3_clients:
 Dependencies
 ------------
 
-The make utility needed on the target hosts.
-Also Ansible community module 'make' must be installed.
+- The make utility needed on the target hosts
+- Also Ansible community module 'make' must be installed
 
 Example Playbook
 ----------------
