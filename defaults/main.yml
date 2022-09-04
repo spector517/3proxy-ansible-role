@@ -13,7 +13,7 @@ proxy3_system_user_id: 201
 
 # List of DNS servers
 proxy3_dns:
-- 1.1.1.1
+  - 1.1.1.1
 
 # true if you want use the Uncomplicated Firewall
 # if false you may need to use other firewall

@@ -1,12 +1,12 @@
 - name: Create system group
-  group:
+  ansible.builtin.group:
     name: proxy3
     gid: '{{ proxy3_system_group_id }}'
     state: present
   become: true
 
 - name: Create system user
-  user:
+  ansible.builtin.user:
     name: proxy3
     group: proxy3
     uid: '{{ proxy3_system_user_id }}'
@@ -17,53 +17,54 @@
   become: true
 
 - name: Install build-essential
-  apt:
+  ansible.builtin.apt:
     name: build-essential
-    state: latest
     update_cache: true
   become: true
 
 - name: Download sources
-  get_url:
+  ansible.builtin.get_url:
     url: 'https://github.com/3proxy/3proxy/archive/refs/tags/{{ proxy3_version }}.tar.gz'
     dest: /tmp/{{ proxy3_version }}.tar.gz
+    mode: '644'
   delegate_to: localhost
   run_once: true
 
 - name: Unarchive sources
-  unarchive:
+  ansible.builtin.unarchive:
     src: /tmp/{{ proxy3_version }}.tar.gz
     dest: /tmp/
+    mode: '644'
   when: not ansible_check_mode
 
 - name: Compile sources
-  make:
+  community.general.make:
     chdir: /tmp/3proxy-{{ proxy3_version }}
     file: Makefile.Linux
   when: not ansible_check_mode
 
 - name: Create work dir
-  file:
+  ansible.builtin.file:
     path: /etc/3proxy
     state: directory
     owner: proxy3
     group: proxy3
-    mode: '0644'
+    mode: '600'
   become: true
 
 - name: Copy binaries
-  copy:
+  ansible.builtin.copy:
     src: /tmp/3proxy-{{ proxy3_version }}/bin/3proxy
     dest: /usr/bin/3proxy
     owner: root
     group: root
-    mode: '0755'
+    mode: '744'
     remote_src: true
   become: true
   when: not ansible_check_mode
 
 - name: Generate encrypted password
-  shell:
+  ansible.builtin.command:
     cmd: 'openssl passwd -1 {{ client.password }}'
   loop: '{{ proxy3_clients }}'
   loop_control:
@@ -71,26 +72,29 @@
     label: client.name
   register: encrypted_passwords
   when:
-  - proxy3_clients is defined
-  - proxy3_clients is iterable
+    - proxy3_clients is defined
+    - proxy3_clients is iterable
 
 - name: Fill and copy config
-  template:
+  ansible.builtin.template:
     src: 3proxy-cfg.j2
     dest: /etc/3proxy/3proxy.cfg
     owner: proxy3
     group: proxy3
-    mode: '0400'
+    mode: '600'
   become: true
 
 - name: Copy systemd unit file
-  copy:
+  ansible.builtin.copy:
     src: 3proxy.service
     dest: /etc/systemd/system/3proxy.service
+    owner: proxy3
+    group: proxy3
+    mode: '644'
   become: true
 
 - name: Start / Restart service
-  systemd:
+  ansible.builtin.systemd:
     service: 3proxy
     state: restarted
     enabled: true
@@ -99,18 +103,18 @@
   when: not ansible_check_mode
 
 - name: Wait 5 seconds...
-  pause:
+  ansible.builtin.pause:
     seconds: 5
 
 - name: Check service status
-  shell:
+  ansible.builtin.command:
     cmd: systemctl status 3proxy.service
   register: service_info
   failed_when: ('active' not in service_info.stdout)
   changed_when: false
 
 - name: Add rules of Uncomplicated Firewall
-  ufw:
+  community.general.ufw:
     rule: allow
     port: '{{ port }}'
     protocol: tcp
@@ -126,7 +130,7 @@
   become: true
 
 - name: Reload Uncomplicated Firewall service
-  ufw:
+  community.general.ufw:
     state: reloaded
   when: proxy3_use_ufw
   become: true
