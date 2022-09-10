@@ -52,7 +52,7 @@ Example Playbook
 ```
 - hosts: servers
   roles:
-  - role: spector517.3proxy
+  - role: spector517.proxy3
 ```
 
 License
