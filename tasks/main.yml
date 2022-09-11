@@ -69,7 +69,7 @@
   loop: '{{ proxy3_clients }}'
   loop_control:
     loop_var: client
-    label: client.name
+    label: '{{ client.name }}'
   register: encrypted_passwords
   when:
     - proxy3_clients is defined
