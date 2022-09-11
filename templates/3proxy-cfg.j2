@@ -6,7 +6,7 @@ nserver {{ server }}
 nscache 65536
 timeouts 1 5 30 60 180 1800 15 60
 daemon
-{% if proxy3_clients is defined and proxy3_clients is iterable %}
+{% if proxy3_clients is defined and proxy3_clients is iterable and proxy3_clients %}
 {% for client in proxy3_clients %}
 users "{{ client.name }}:CR:{{ encrypted_passwords.results[loop.index0].stdout }}"
 {% endfor %}
