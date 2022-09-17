@@ -1,3 +1,9 @@
+- name: Reload Uncomplicated Firewall service
+  community.general.ufw:
+    state: reloaded
+  become: true
+  listen: 'proxy3 : reload firewall'
+
 - name: Restart service
   ansible.builtin.systemd:
     service: 3proxy
@@ -7,9 +13,3 @@
   become: true
   when: not ansible_check_mode
   listen: 'proxy3 : restart service'
-
-- name: Reload Uncomplicated Firewall service
-  community.general.ufw:
-    state: reloaded
-  become: true
-  listen: 'proxy3 : reload firewall'
