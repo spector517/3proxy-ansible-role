@@ -44,7 +44,8 @@ Dependencies
 ------------
 
 - The make utility needed on the target hosts
-- Also Ansible community module 'make' must be installed
+- Ansible community module 'community.general.make' must be installed
+- Ansible community module 'community.general.ufw' must be installed
 
 Example Playbook
 ----------------
