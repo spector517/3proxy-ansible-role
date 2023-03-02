@@ -19,6 +19,8 @@ proxy3_dns:
 # if false you may need to use other firewall
 proxy3_use_ufw: false
 
+proxy3_build_essential_version: latest
+
 # Clients of proxy server (accept all connections if empty or undefined)
 # proxy3_clients:
 # - name: client0

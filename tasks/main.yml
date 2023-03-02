@@ -19,7 +19,7 @@
 - name: Install build-essential
   ansible.builtin.apt:
     name: build-essential
-    state: latest
+    state: '{{ proxy3_build_essential_version }}'
     update_cache: true
   become: true
 
@@ -76,6 +76,7 @@
   when:
     - proxy3_clients is defined
     - proxy3_clients is iterable
+  changed_when: false
 
 - name: Fill and copy config
   ansible.builtin.template:
