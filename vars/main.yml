@@ -1,0 +1,8 @@
+# Most important vars
+
+# Clients of proxy server (accept all connections if empty or undefined)
+proxy3_clients:
+  - name: client0
+    password: qwe123
+  - name: client1
+    password: 123qwe
